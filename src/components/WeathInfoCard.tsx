@@ -37,7 +37,6 @@ export function WeatherInfoCard({
   humidity,
   icon,
   pinned,
-
   addToLS,
   altText,
   doomify,

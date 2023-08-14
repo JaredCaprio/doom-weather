@@ -1,113 +1,175 @@
-import Image from 'next/image'
+"use client";
+import { WeatherInfoCard } from "@/components/WeathInfoCard";
+
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { Vina_Sans } from "next/font/google";
+import FetchWeatherData from "../utils/FetchWeatherData";
+import Modal from "../components/Modal";
+import { BsFillGearFill } from "react-icons/bs";
+
+export const title = Vina_Sans({
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
+type weatherData = {
+  location: {
+    name: string;
+    region: string;
+    country: string;
+  };
+  current: {
+    condition: {
+      text: string;
+      icon: string;
+    };
+    temp_f: number;
+    humidity: number;
+  };
+  error?: {
+    code: number;
+    message: string;
+  };
+};
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+  const [weatherData, setWeatherData] = useState<weatherData>();
+  const [pinnedLocations, setPinnedLocations] = useState<Array<string>>([]);
+  const [pinnedLocationsData, setPinnedLocationsData] = useState<weatherData[]>(
+    []
+  );
+  const [openModal, setOpenModal] = useState(false);
+  const [doomify, setDoomify] = useState(true);
+  const inputRef = useRef<any>(null);
+  console.log(pinnedLocations, "Pin locations global scope");
+  function getItemsFromLocalStorage() {
+    const pinsFromLocalStorage = localStorage.getItem("pinnedCities");
+    if (pinsFromLocalStorage !== null) {
+      setPinnedLocations(JSON.parse(pinsFromLocalStorage));
+      console.log(JSON.parse(pinsFromLocalStorage));
+    }
+  }
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+  async function fetchDataForPinnedLocations() {
+    console.log(
+      pinnedLocations,
+      "Pin locations from fetchDataforPinnedLocations"
+    );
+    const promises = pinnedLocations.map((city) => {
+      console.log("buttholeWillFart");
+      return FetchWeatherData(city);
+    });
+    const resolvedData = await Promise.all(promises);
+    setPinnedLocationsData(resolvedData);
+  }
+
+  function addLocationToLocalStorage(cityName: string) {
+    let itemsInLocalStorage = localStorage.getItem("pinnedCities");
+
+    if (itemsInLocalStorage !== null) {
+      const parsedItems = JSON.parse(itemsInLocalStorage);
+      if (!parsedItems.includes(cityName)) {
+        parsedItems.push(cityName);
+        localStorage.setItem("pinnedCities", JSON.stringify(parsedItems));
+        setPinnedLocations((prev) => [...prev, cityName]);
+      } else {
+        //remove from Local Storage
+        const filteredList = pinnedLocations.filter((loc) => loc !== cityName);
+        localStorage.setItem("pinnedCities", JSON.stringify(filteredList));
+        setPinnedLocations(filteredList);
+      }
+    } else {
+      localStorage.setItem("pinnedCities", JSON.stringify([cityName]));
+      setPinnedLocations([cityName]);
+    }
+  }
+
+  async function handleSubmit(e: any) {
+    e.preventDefault();
+    if (inputRef.current !== null) {
+      const currentValue = inputRef.current.value;
+      const data = await FetchWeatherData(currentValue);
+      setWeatherData(data);
+    }
+  }
+
+  useEffect(() => {
+    getItemsFromLocalStorage();
+  }, []);
+
+  useEffect(() => {
+    fetchDataForPinnedLocations();
+  }, [pinnedLocations]);
+  console.log(pinnedLocationsData);
+  return (
+    <div className="relative">
+      {openModal && (
+        <Modal
+          setDoomify={setDoomify}
+          doomify={doomify}
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+        />
+      )}
+      <header className="flex justify-start gap-3 items-end mb-4">
+        <h1 className={`${title.className} text-5xl`}>Doom Weather</h1>
+        <sub className="text-xs italic">
+          We&#39;re are all going to burn to death
+        </sub>
+      </header>
+
+      <div className="flex gap-1 justify-end relative">
+        <form onSubmit={(e) => handleSubmit(e)} className="m-5">
+          <input
+            ref={inputRef}
+            type="text"
+            name="city"
+            placeholder="Enter City Name"
+            className="border border-slate-300 bg-transparent rounded px-2 py-1 outline-none focus-within:border-slate-100"
+          />
+          <button className="border border-slate-300 text-slate-300 px-2 py-1 rounded hover:bg-slate-700 focus-within:bg-slate-700 outline-none">
+            Search
+          </button>
+        </form>
+      </div>
+      <BsFillGearFill
+        onClick={() => setOpenModal(true)}
+        style={{ position: "absolute", top: 0, right: 0 }}
+      />
+      <div className="flex flex-row gap-3 mb-4 font-mono">
+        <WeatherInfoCard
+          city={weatherData?.location.name}
+          temp_f={weatherData?.current.temp_f}
+          region={weatherData?.location.region}
+          condition={weatherData?.current.condition.text}
+          humidity={weatherData?.current.humidity}
+          icon={weatherData?.current.condition.icon}
+          country={weatherData?.location.country}
+          altText={"Enter Valid City"}
+          addToLS={addLocationToLocalStorage}
+          doomify={doomify}
         />
       </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      {pinnedLocations && <h3 className="mb-2">Pinned Locations</h3>}
+      <div className="flex flex-column flex-wrap gap-1 font-mono">
+        {pinnedLocationsData.map((weatherData, i) => (
+          <WeatherInfoCard
+            key={i}
+            city={weatherData?.location.name}
+            temp_f={weatherData?.current.temp_f}
+            region={weatherData?.location.region}
+            condition={weatherData?.current.condition.text}
+            humidity={weatherData?.current.humidity}
+            icon={weatherData?.current.condition.icon}
+            country={weatherData?.location.country}
+            pinned={true}
+            addToLS={addLocationToLocalStorage}
+            doomify={doomify}
+          />
+        ))}
       </div>
-    </main>
-  )
+    </div>
+  );
 }

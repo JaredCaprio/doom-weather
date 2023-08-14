@@ -3,7 +3,7 @@ export default async function FetchWeatherData(data: any) {
 
   try {
     let weatherData = await fetch(
-      `http://api.weatherapi.com/v1/current.json?key=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&q=${city}&aqi=no`
+      `https://api.weatherapi.com/v1/current.json?key=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&q=${city}&aqi=no`
     );
     if (weatherData.ok) {
       return weatherData.json();

@@ -1,18 +1,17 @@
 "use client";
 import { WeatherInfoCard } from "@/components/WeathInfoCard";
-
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Vina_Sans } from "next/font/google";
+/* import { Vina_Sans } from "next/font/google"; */
 import FetchWeatherData from "../utils/FetchWeatherData";
 import Modal from "../components/Modal";
 import { BsFillGearFill } from "react-icons/bs";
 
-export const title = Vina_Sans({
+/* export const title = Vina_Sans({
   subsets: ["latin"],
   weight: ["400"],
-});
+}); */
 
 type weatherData = {
   location: {
@@ -114,7 +113,7 @@ export default function Home() {
         />
       )}
       <header className="flex justify-start gap-3 items-end mb-4">
-        <h1 className={`${title.className} text-5xl`}>Doom Weather</h1>
+        <h1 className={`text-5xl`}>Doom Weather</h1>
         <sub className="text-xs italic">
           We&#39;re are all going to burn to death
         </sub>

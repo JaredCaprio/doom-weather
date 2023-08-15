@@ -41,23 +41,19 @@ export default function Home() {
   );
   const [openModal, setOpenModal] = useState(false);
   const [doomify, setDoomify] = useState(true);
+
+  console.log(weatherData);
+
   const inputRef = useRef<any>(null);
-  console.log(pinnedLocations, "Pin locations global scope");
   function getItemsFromLocalStorage() {
     const pinsFromLocalStorage = localStorage.getItem("pinnedCities");
     if (pinsFromLocalStorage !== null) {
       setPinnedLocations(JSON.parse(pinsFromLocalStorage));
-      console.log(JSON.parse(pinsFromLocalStorage));
     }
   }
 
   async function fetchDataForPinnedLocations() {
-    console.log(
-      pinnedLocations,
-      "Pin locations from fetchDataforPinnedLocations"
-    );
     const promises = pinnedLocations.map((city) => {
-      console.log("buttholeWillFart");
       return FetchWeatherData(city);
     });
     const resolvedData = await Promise.all(promises);
@@ -101,9 +97,9 @@ export default function Home() {
   useEffect(() => {
     fetchDataForPinnedLocations();
   }, [pinnedLocations]);
-  console.log(pinnedLocationsData);
+
   return (
-    <div className="relative">
+    <div>
       {openModal && (
         <Modal
           setDoomify={setDoomify}
@@ -135,22 +131,25 @@ export default function Home() {
       </div>
       <BsFillGearFill
         onClick={() => setOpenModal(true)}
-        style={{ position: "absolute", top: 0, right: 0 }}
+        style={{ position: "absolute", top: 10, right: 10 }}
       />
-      <div className="flex flex-row gap-3 mb-4 font-mono">
-        <WeatherInfoCard
-          city={weatherData?.location.name}
-          temp_f={weatherData?.current.temp_f}
-          region={weatherData?.location.region}
-          condition={weatherData?.current.condition.text}
-          humidity={weatherData?.current.humidity}
-          icon={weatherData?.current.condition.icon}
-          country={weatherData?.location.country}
-          altText={"Enter Valid City"}
-          addToLS={addLocationToLocalStorage}
-          doomify={doomify}
-        />
-      </div>
+      {weatherData && (
+        <div className="flex flex-row gap-3 mb-4 font-mono">
+          <WeatherInfoCard
+            city={weatherData?.location.name}
+            temp_f={weatherData?.current.temp_f}
+            region={weatherData?.location.region}
+            condition={weatherData?.current.condition.text}
+            humidity={weatherData?.current.humidity}
+            icon={weatherData?.current.condition.icon}
+            country={weatherData?.location.country}
+            altText={"Enter Valid City"}
+            addToLS={addLocationToLocalStorage}
+            doomify={doomify}
+          />
+        </div>
+      )}
+
       {pinnedLocations && <h3 className="mb-2">Pinned Locations</h3>}
       <div className="flex flex-column flex-wrap gap-1 font-mono">
         {pinnedLocationsData.map((weatherData, i) => (

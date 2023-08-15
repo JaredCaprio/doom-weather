@@ -79,9 +79,7 @@ export function WeatherInfoCard({
               }`}
           </p>
         </>
-      ) : (
-        [altText]
-      )}
+      ) : null}
     </div>
   );
 }

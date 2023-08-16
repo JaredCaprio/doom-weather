@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import React, { useMemo } from "react";
 import { AiFillPushpin } from "react-icons/ai";
 
 type WeatherInfoProps = {
@@ -24,8 +25,8 @@ const phrases = [
   " chance of melting into a pool of flesh",
 ];
 
-function genRanNum(limit: number) {
-  return Math.floor(Math.random() * limit);
+function useMemoizedRandomNumber(limit: number) {
+  return useMemo(() => Math.floor(Math.random() * limit), [limit]);
 }
 
 export function WeatherInfoCard({
@@ -41,6 +42,8 @@ export function WeatherInfoCard({
   altText,
   doomify,
 }: WeatherInfoProps) {
+  const randomNumWithLimit100 = useMemoizedRandomNumber(100);
+  const randomNumWithLimitPhrasesLen = useMemoizedRandomNumber(phrases.length);
   return (
     <div
       className="border border-slate-400 hover:border-slate-500 shadow-slate-300 transition-colors rounded-lg p-4 relative"
@@ -50,7 +53,7 @@ export function WeatherInfoCard({
         <div className="absolute right-2 top-2 cursor-pointer slate-50 hover:slate-400">
           <AiFillPushpin
             className="opacity-10 hover:opacity-100 transition-all delay-15"
-            onClick={() => addToLS(city)}
+            onClick={() => addToLS(city, region)}
             style={pinned && { color: "firebrick", opacity: "1" }}
           />
         </div>
@@ -74,9 +77,7 @@ export function WeatherInfoCard({
           <p>
             {condition}
             {doomify &&
-              ` with a ${genRanNum(100)}% ${
-                phrases[genRanNum(phrases.length)]
-              }`}
+              ` with a ${randomNumWithLimit100}% ${phrases[randomNumWithLimitPhrasesLen]}`}
           </p>
         </>
       ) : null}

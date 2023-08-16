@@ -1,17 +1,10 @@
 "use client";
 import { WeatherInfoCard } from "@/components/WeathInfoCard";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-/* import { Vina_Sans } from "next/font/google"; */
 import FetchWeatherData from "../utils/FetchWeatherData";
 import Modal from "../components/Modal";
 import { BsFillGearFill } from "react-icons/bs";
-
-/* export const title = Vina_Sans({
-  subsets: ["latin"],
-  weight: ["400"],
-}); */
+import useLocalStorage from "@/customHooks/useLocalStorage";
 
 type weatherData = {
   location: {
@@ -34,17 +27,19 @@ type weatherData = {
 };
 
 export default function Home() {
-  const [weatherData, setWeatherData] = useState<weatherData>();
+  const [weatherData, setWeatherData] = useState<weatherData | null>();
   const [pinnedLocations, setPinnedLocations] = useState<Array<string>>([]);
   const [pinnedLocationsData, setPinnedLocationsData] = useState<weatherData[]>(
     []
   );
   const [openModal, setOpenModal] = useState(false);
   const [doomify, setDoomify] = useState(true);
-
-  console.log(weatherData);
-
   const inputRef = useRef<any>(null);
+
+  function closeModal() {
+    setOpenModal(false);
+  }
+
   function getItemsFromLocalStorage() {
     const pinsFromLocalStorage = localStorage.getItem("pinnedCities");
     if (pinsFromLocalStorage !== null) {
@@ -60,33 +55,41 @@ export default function Home() {
     setPinnedLocationsData(resolvedData);
   }
 
-  function addLocationToLocalStorage(cityName: string) {
+  function addLocationToLocalStorage(cityName: string, regionName: string) {
     let itemsInLocalStorage = localStorage.getItem("pinnedCities");
+    console.log(cityName, regionName);
 
     if (itemsInLocalStorage !== null) {
       const parsedItems = JSON.parse(itemsInLocalStorage);
-      if (!parsedItems.includes(cityName)) {
-        parsedItems.push(cityName);
+      if (!parsedItems.includes(`${cityName} ${regionName}`)) {
+        parsedItems.push(`${cityName} ${regionName}`);
         localStorage.setItem("pinnedCities", JSON.stringify(parsedItems));
-        setPinnedLocations((prev) => [...prev, cityName]);
+        setPinnedLocations((prev) => [...prev, `${cityName} ${regionName}`]);
       } else {
         //remove from Local Storage
-        const filteredList = pinnedLocations.filter((loc) => loc !== cityName);
+        const filteredList = parsedItems.filter(
+          (loc: any) => loc !== `${cityName} ${regionName}`
+        );
         localStorage.setItem("pinnedCities", JSON.stringify(filteredList));
         setPinnedLocations(filteredList);
       }
     } else {
       localStorage.setItem("pinnedCities", JSON.stringify([cityName]));
-      setPinnedLocations([cityName]);
+      setPinnedLocations([`${cityName} ${regionName}`]);
     }
   }
 
   async function handleSubmit(e: any) {
     e.preventDefault();
-    if (inputRef.current !== null) {
-      const currentValue = inputRef.current.value;
-      const data = await FetchWeatherData(currentValue);
-      setWeatherData(data);
+    try {
+      if (inputRef.current !== null) {
+        const currentValue = inputRef.current.value;
+        const data = await FetchWeatherData(currentValue);
+        setWeatherData(data);
+      }
+    } catch (error) {
+      console.log(error, "tried and caught a case B");
+      setWeatherData(null);
     }
   }
 
@@ -105,11 +108,11 @@ export default function Home() {
           setDoomify={setDoomify}
           doomify={doomify}
           openModal={openModal}
-          setOpenModal={setOpenModal}
+          closeModal={closeModal}
         />
       )}
       <header className="flex justify-start gap-3 items-end mb-4">
-        <h1 className={`text-5xl`}>Doom Weather</h1>
+        <h1 className="text-5xl">Doom Weather</h1>
         <sub className="text-xs italic">
           We&#39;re are all going to burn to death
         </sub>
@@ -143,14 +146,14 @@ export default function Home() {
             humidity={weatherData?.current.humidity}
             icon={weatherData?.current.condition.icon}
             country={weatherData?.location.country}
-            altText={"Enter Valid City"}
+            altText={weatherData ? "Enter Valid City" : ""}
             addToLS={addLocationToLocalStorage}
             doomify={doomify}
           />
         </div>
       )}
 
-      {pinnedLocations && <h3 className="mb-2">Pinned Locations</h3>}
+      {pinnedLocations.length > 0 && <h3 className="mb-2">Pinned Locations</h3>}
       <div className="flex flex-column flex-wrap gap-1 font-mono">
         {pinnedLocationsData.map((weatherData, i) => (
           <WeatherInfoCard

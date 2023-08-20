@@ -9,7 +9,7 @@ function getSavedValue(key, initialValue) {
 
 export default function useLocalStorage(key, initialValue) {
   const [value, setValue] = useState(() => {
-    return getSavedValue;
+    return getSavedValue(key, initialValue);
   });
 
   useEffect(() => {

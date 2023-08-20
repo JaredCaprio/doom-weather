@@ -15,6 +15,7 @@ type WeatherInfoProps = {
   addToLS: Function;
   altText?: String;
   doomify?: boolean;
+  currentValue?: string;
 };
 
 const phrases = [
@@ -41,6 +42,7 @@ export function WeatherInfoCard({
   addToLS,
   altText,
   doomify,
+  currentValue,
 }: WeatherInfoProps) {
   const randomNumWithLimit100 = useMemoizedRandomNumber(100);
   const randomNumWithLimitPhrasesLen = useMemoizedRandomNumber(phrases.length);
@@ -53,7 +55,7 @@ export function WeatherInfoCard({
         <div className="absolute right-2 top-2 cursor-pointer slate-50 hover:slate-400">
           <AiFillPushpin
             className="opacity-10 hover:opacity-100 transition-all delay-15"
-            onClick={() => addToLS(city, region)}
+            onClick={() => addToLS(currentValue)}
             style={pinned && { color: "firebrick", opacity: "1" }}
           />
         </div>
@@ -64,8 +66,9 @@ export function WeatherInfoCard({
           <h1 className="text-4xl">{city}</h1>
           <p>{region}</p>
           <p>{country}</p>
+
           <p className="text-3xl">{`${
-            temp_f && doomify ? temp_f + 50 + "°F" : temp_f + "°F" ? temp_f : ""
+            temp_f && doomify ? temp_f + 50 + "°F" : temp_f + "°F"
           }`}</p>
           <p className="text-xs">{humidity}% Humidity</p>
           <div className="flex flex-row">

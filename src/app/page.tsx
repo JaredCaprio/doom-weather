@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import FetchWeatherData from "../utils/FetchWeatherData";
 import Modal from "../components/Modal";
 import { BsFillGearFill } from "react-icons/bs";
-import useLocalStorage from "@/customHooks/useLocalStorage";
+import { useLocalStorage } from "@/customHooks/useLocalStorage";
 import { Advent_Pro } from "next/font/google";
 import Image from "next/image";
 
@@ -37,7 +37,7 @@ type weatherData = {
 
 export default function Home() {
   const [weatherData, setWeatherData] = useState<weatherData | null>();
-  const [pinnedLocations, setPinnedLocations] = useLocalStorage(
+  const [pinnedLocations, setPinnedLocations] = useLocalStorage<string[]>(
     "pinnedCities",
     []
   );
@@ -64,7 +64,6 @@ export default function Home() {
 
       if (data !== null) {
         setValidInput(true);
-        console.log(validInput);
         setWeatherData({ ...data, currentValue });
       } else {
         setValidInput(false);
@@ -78,7 +77,6 @@ export default function Home() {
   function addLocationToLocalStorage(currentValue: string) {
     if (pinnedLocations !== null) {
       if (!pinnedLocations.includes(currentValue)) {
-        console.log(currentValue, "curVal in addLocationToflocajstor");
         setPinnedLocations((prev: any) => [...prev, currentValue]);
       } else {
         const curVal = currentValue;
@@ -90,11 +88,9 @@ export default function Home() {
     }
   }
 
-  console.log(validInput);
   //Fetch the data for the pinned locations on load of page
   async function fetchDataForPinnedLocations() {
     const promises = pinnedLocations.map((currentValue: any) => {
-      console.log(currentValue);
       return FetchWeatherData(currentValue);
     });
 
@@ -105,7 +101,6 @@ export default function Home() {
       currentValue: pinnedLocations[index],
     }));
 
-    console.log(weatherData);
     setPinnedLocationsData(pinnedLocationsWithData);
   }
 

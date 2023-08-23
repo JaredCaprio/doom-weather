@@ -49,7 +49,7 @@ export function WeatherInfoCard({
   return (
     <div
       className="border border-slate-400 hover:border-slate-500 shadow-slate-300 transition-colors rounded-lg p-4 relative"
-      style={{ width: "auto", maxWidth: "350px" }}
+      style={{ width: "calc(100 * 98vw)", maxWidth: "350px" }}
     >
       {city ? (
         <div className="absolute right-2 top-2 cursor-pointer slate-50 hover:slate-400">
@@ -63,7 +63,7 @@ export function WeatherInfoCard({
 
       {city !== undefined ? (
         <>
-          <h1 className="text-4xl">{city}</h1>
+          <h1 style={{ fontSize: "calc(16px + 1vw)" }}>{city}</h1>
           <p>{region}</p>
           <p>{country}</p>
 

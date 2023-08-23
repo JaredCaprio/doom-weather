@@ -153,9 +153,9 @@ export default function Home() {
       />
       {!validInput && (
         <div className="flex justify-center items-center relative">
-          <h3 className="absolute tracking-widest text-3xl text-red-400 z-10">
+          <p className="absolute tracking-widest text-3xl text-red-400 z-10">
             INVALID INPUT
-          </h3>
+          </p>
           <Image
             className="opacity-50"
             src="/face-melt.gif"
@@ -184,23 +184,24 @@ export default function Home() {
         </div>
       )}
 
-      {pinnedLocations.length > 0 && <h3 className="mb-2">Pinned Locations</h3>}
-      <div className="flex flex-column flex-wrap gap-1 font-mono">
+      <div className="flex flex-wrap gap-1 font-mono">
         {pinnedLocationsData.map((weatherData, i) => (
-          <WeatherInfoCard
-            key={i}
-            city={weatherData?.location.name}
-            temp_f={weatherData?.current.temp_f}
-            region={weatherData?.location.region}
-            condition={weatherData?.current.condition.text}
-            humidity={weatherData?.current.humidity}
-            icon={weatherData?.current.condition.icon}
-            country={weatherData?.location.country}
-            pinned={true}
-            addToLS={addLocationToLocalStorage}
-            doomify={doomify}
-            currentValue={weatherData?.currentValue}
-          />
+          <>
+            <WeatherInfoCard
+              key={i}
+              city={weatherData?.location.name}
+              temp_f={weatherData?.current.temp_f}
+              region={weatherData?.location.region}
+              condition={weatherData?.current.condition.text}
+              humidity={weatherData?.current.humidity}
+              icon={weatherData?.current.condition.icon}
+              country={weatherData?.location.country}
+              pinned={true}
+              addToLS={addLocationToLocalStorage}
+              doomify={doomify}
+              currentValue={weatherData?.currentValue}
+            />
+          </>
         ))}
       </div>
     </div>

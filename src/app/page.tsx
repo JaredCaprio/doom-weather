@@ -184,7 +184,7 @@ export default function Home() {
         </div>
       )}
 
-      <div className="flex flex-wrap gap-1 font-mono">
+      <div className="flex flex-wrap gap-1 font-mono mt-10">
         {pinnedLocationsData.map((weatherData, i) => (
           <>
             <WeatherInfoCard

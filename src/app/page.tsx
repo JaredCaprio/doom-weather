@@ -129,7 +129,7 @@ export default function Home() {
         >
           Doom Weather
         </h1>
-        <sub className="text-xs italic">
+        <sub className="hidden sm:block  text-xs italic">
           We&#39;re are all going to burn to death
         </sub>
       </header>
@@ -149,7 +149,7 @@ export default function Home() {
       </div>
       <BsFillGearFill
         onClick={() => setOpenModal(true)}
-        style={{ position: "absolute", top: 10, right: 10 }}
+        style={{ position: "absolute", top: 23, right: 10 }}
       />
       {!validInput && (
         <div className="flex justify-center items-center relative">

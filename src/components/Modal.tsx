@@ -3,10 +3,26 @@ type Props = {
   openModal: boolean;
   setDoomify: Function;
   doomify: boolean;
+  fToC: boolean;
+  setFToC: Function;
   closeModal: () => void;
 };
 
-export default function Modal({ closeModal, doomify, setDoomify }: Props) {
+export default function Modal({
+  closeModal,
+  doomify,
+  setDoomify,
+  setFToC,
+  fToC,
+}: Props) {
+  function handleSelectChange(e: any) {
+    if (e.target.value === "Celsius") {
+      setFToC((prev: any) => !prev);
+    } else if (e.target.value === "Fahrenheit") {
+      setFToC((prev: any) => !prev);
+    }
+  }
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10 modal-wrapper">
       <div className="relative bg-slate-700 p-10 rounded-xl">
@@ -25,7 +41,24 @@ export default function Modal({ closeModal, doomify, setDoomify }: Props) {
           name="doomify"
           checked={doomify}
           onChange={() => setDoomify((prev: any) => !prev)}
-        />
+        />{" "}
+        <br />
+        <label className="mr-5" htmlFor="doomify">
+          Temperature Scale
+        </label>
+        <select
+          name="fToC"
+          id="fToC"
+          className="text-slate-700 focus:ring-red-200"
+          onChange={handleSelectChange}
+        >
+          <option selected={fToC === false} value="Fahrenheit">
+            Fahrenheit
+          </option>
+          <option selected={fToC === true} value="Celsius">
+            Celsius
+          </option>
+        </select>
       </div>
     </div>
   );

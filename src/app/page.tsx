@@ -27,6 +27,7 @@ type weatherData = {
       icon: string;
     };
     temp_f: number;
+    temp_c: number;
     humidity: number;
   };
   error?: {
@@ -47,7 +48,10 @@ export default function Home() {
   const [validInput, setValidInput] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [doomify, setDoomify] = useState(true);
+  const [fToC, setFToC] = useState(false);
   const inputRef = useRef<any>(null);
+
+  console.log(fToC);
 
   function closeModal() {
     setOpenModal(false);
@@ -113,6 +117,8 @@ export default function Home() {
       {openModal && (
         <Modal
           setDoomify={setDoomify}
+          setFToC={setFToC}
+          fToC={fToC}
           doomify={doomify}
           openModal={openModal}
           closeModal={closeModal}
@@ -129,7 +135,7 @@ export default function Home() {
         >
           Doom Weather
         </h1>
-        <sub className="hidden sm:block  text-xs italic">
+        <sub className="hidden sm:block text-xs italic">
           We&#39;re are all going to burn to death
         </sub>
       </header>
@@ -171,6 +177,7 @@ export default function Home() {
           <WeatherInfoCard
             city={weatherData?.location.name}
             temp_f={weatherData?.current.temp_f}
+            temp_c={weatherData?.current.temp_c}
             region={weatherData?.location.region}
             condition={weatherData?.current.condition.text}
             humidity={weatherData?.current.humidity}
@@ -180,6 +187,7 @@ export default function Home() {
             addToLS={addLocationToLocalStorage}
             doomify={doomify}
             currentValue={weatherData.currentValue}
+            fToC={fToC}
           />
         </div>
       )}
@@ -191,6 +199,7 @@ export default function Home() {
               key={i}
               city={weatherData?.location.name}
               temp_f={weatherData?.current.temp_f}
+              temp_c={weatherData?.current.temp_c}
               region={weatherData?.location.region}
               condition={weatherData?.current.condition.text}
               humidity={weatherData?.current.humidity}
@@ -200,6 +209,7 @@ export default function Home() {
               addToLS={addLocationToLocalStorage}
               doomify={doomify}
               currentValue={weatherData?.currentValue}
+              fToC={fToC}
             />
           </>
         ))}

@@ -8,6 +8,7 @@ type WeatherInfoProps = {
   city?: string;
   region?: string;
   temp_f?: number;
+  temp_c: number;
   condition?: string;
   humidity?: number;
   icon?: string;
@@ -15,6 +16,7 @@ type WeatherInfoProps = {
   addToLS: Function;
   altText?: String;
   doomify?: boolean;
+  fToC?: boolean;
   currentValue?: string;
 };
 
@@ -35,6 +37,7 @@ export function WeatherInfoCard({
   city,
   region,
   temp_f,
+  temp_c,
   condition,
   humidity,
   icon,
@@ -42,6 +45,7 @@ export function WeatherInfoCard({
   addToLS,
   altText,
   doomify,
+  fToC,
   currentValue,
 }: WeatherInfoProps) {
   const randomNumWithLimit100 = useMemoizedRandomNumber(100);
@@ -66,10 +70,16 @@ export function WeatherInfoCard({
           <h1 style={{ fontSize: "calc(16px + 1vw)" }}>{city}</h1>
           <p>{region}</p>
           <p>{country}</p>
+          {fToC ? (
+            <p className="text-3xl">{`${
+              temp_c && doomify ? temp_c + 50 + "°C" : temp_c + "°C"
+            }`}</p>
+          ) : (
+            <p className="text-3xl">{`${
+              temp_f && doomify ? temp_f + 50 + "°F" : temp_f + "°F"
+            }`}</p>
+          )}
 
-          <p className="text-3xl">{`${
-            temp_f && doomify ? temp_f + 50 + "°F" : temp_f + "°F"
-          }`}</p>
           <p className="text-xs">{humidity}% Humidity</p>
           <div className="flex flex-row">
             {doomify && (
